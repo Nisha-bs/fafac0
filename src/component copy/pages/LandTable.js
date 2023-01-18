@@ -1,5 +1,6 @@
 import axios from "axios";
 import React from "react";
+import { useSelector } from "react-redux";
 import classes from "./landtable.module.css";
 
 const LandTable = () => {
@@ -58,98 +59,13 @@ const LandTable = () => {
       buyDetails: [],
       sellDetails: [],
     },
-    {
-      farmerDetails: {
-        whatsappNumber: 9629772451,
-        farmerId: "NIS0007",
-        nickName: "ss",
-        farmerName: "nish",
-        age: 21,
-        gender: "female",
-        fatherName: "nish",
-        phoneNumber: 9629772451,
-        state: "Tamilnadu",
-        district: "Ramanathapuram",
-        union: "Mandapam",
-        panchayat: "Pudumadam",
-        village: "Ammapattinam",
-        organic: false,
-        singleSeed: false,
-        altCrop: false,
-        seedVariety: false,
-        leaseOwnLand: false,
-        farmRentedLand: false,
-      },
-      livestockDetails: [],
-      labourDetails: [
-        {
-          landPlowing: false,
-          weedRemoving: false,
-          pesticideSpraying: false,
-          handHarvesting: false,
-          cropSpanking: false,
-          pumpsetDuty: false,
-          landCleaning: false,
-          treeClimbing: false,
-          paddySteaming: false,
-          landPlowingWithTractor: false,
-          fertilization: false,
-        },
-      ],
-      machineDetails: [],
-      landDetails: [
-        {
-          supervisorId: "",
-          ownerId: "NIS0007",
-          category: "availableForLease",
-          addons: "None",
-          landId: "NIS0007001",
-          area: 100,
-        },
-        {
-          supervisorId: "",
-          ownerId: "NIS0007",
-          category: "wasteLand",
-          addons: "None",
-          landId: "NIS0007002",
-          area: 102,
-        },
-        {
-          supervisorId: "",
-          ownerId: "NIS0007",
-          category: "availableForLease",
-          addons: "None",
-          landId: "NIS0007003",
-          area: 100,
-        },
-        {
-          supervisorId: "",
-          ownerId: "NIS0007",
-          category: "availableForLease",
-          addons: "None",
-          landId: "NIS0007004",
-          area: 100,
-        },
-        {
-          supervisorId: "",
-          ownerId: "NIS0007",
-          category: "availableForLease",
-          addons: "None",
-          landId: "NIS0007005",
-          area: 100,
-        },
-      ],
-      cropDetails: [],
-      gardenDetails: [],
-      buyDetails: [],
-      sellDetails: [],
-    },
   ];
 
+  const { landData } = useSelector((state) => state.land);
   var farmers = [];
   var land = [];
   farmerDetails.map((farmer) => (land = farmer.landDetails));
-  console.log("farmers", land);
+  console.log("farmers", land, landData);
 
   farmerDetails.map((farmer) => console.log(farmer.farmerDetails));
   const onClickHandler = () => {};

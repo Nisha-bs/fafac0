@@ -774,6 +774,8 @@ const Land = () => {
     //       console.log("rent error", error);
     //     });
     // }
+
+    navigate("/cropform");
   };
 
   if (interestedFor == "takenLease") {
@@ -1365,28 +1367,11 @@ const Land = () => {
               </select>
             </div>
             <div>
-              <button
-                style={{ float: "left", marginLeft: "2rem", marginTop: "2rem" }}
-                onClick={submitHandler}
-              >
-                submit
-              </button>
-            </div>
-            <div>
-              <button
-                style={{
-                  float: "right",
-                  marginRight: "2rem",
-                  marginTop: "2rem",
-                }}
-                onClick={submitNextHandler}
-              >
-                save & next
-              </button>
+              <button onClick={submitHandler}>submit</button>
             </div>
           </form>
         )}
-        {table && <LandTable />}
+        {/* {table && <LandTable />} */}
       </div>
     </Layout>
   );
