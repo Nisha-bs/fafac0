@@ -1,6 +1,8 @@
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
+import { Navigate, useNavigate } from "react-router-dom";
 import classes from "./landtable.module.css";
 
 const LandTable = () => {
@@ -61,7 +63,10 @@ const LandTable = () => {
     },
   ];
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { landData } = useSelector((state) => state.land);
+  const [editLand, setEditLand] = useState([]);
   var farmers = [];
   var land = [];
   farmerDetails.map((farmer) => (land = farmer.landDetails));
@@ -84,25 +89,47 @@ const LandTable = () => {
     });
   };
 
+  const editHandler = (ind) => {
+    navigate("/editland");
+    // landData.map((land, landind) => {
+    //   if (ind === landind) {
+    //   } else {
+    //     setEditLand([...editLand, land]);
+    //   }
+    // });
+  };
+  const detailsHandler = () => {
+    navigate("/cropform");
+  };
+  const cancelHandler = () => {
+    navigate("/land");
+  };
+  const addHandler = () => {
+    navigate("/land");
+  };
+
   return (
     <div className={classes.land}>
       <div className={classes.container}>
         <h1>Land Details</h1>
+        <div className="remove-button">
+          <button onClick={() => addHandler()}>Add Land</button>
+        </div>
         <table border="1" className="table">
           <thead>
             <tr className="table-head-row">
               <th>Land ID</th>
               <th>Onwer ID</th>
               <th>category</th>
-              <th>Name</th>
+              {/* <th>Name</th>
               <th>Area</th>
               <th>Father Name</th>
-              <th>phoneNumber</th>
+              <th>phoneNumber</th> */}
               <th>Supervisor ID</th>
               <th></th>
             </tr>
           </thead>
-          <tbody>
+          {/* <tbody>
             {farmerDetails.map((farmer) =>
               farmer.landDetails.map((land) => (
                 <tr key={land.landId}>
@@ -120,8 +147,36 @@ const LandTable = () => {
                 </tr>
               ))
             )}
+          </tbody> */}
+          <tbody>
+            {landData.map((land, ind) => (
+              <tr key={land.landId}>
+                <td> {land.landId} </td>
+                <td>{land.ownerId}</td>
+                <td>{land.category}</td>
+                {/* <td>{farmer.farmerDetails.farmerName}</td>
+                <td>{farmer.farmerDetails.area}</td>
+                <td>{farmer.farmerDetails.fatherName}</td>
+                <td>{farmer.farmerDetails.phoneNumber}</td> */}
+                <td>{land.supervisorId}</td>
+                <div className="remove-button">
+                  {/* <button onClick={removeHandler(land.landId)}>Edit</button> */}
+                  <button onClick={removeHandler(ind)}>Edit</button>
+                </div>
+                <div className="remove-button">
+                  {/* <button onClick={editHandler(land.landId)}>Remove</button> */}
+                  <button onClick={editHandler(ind)}>Remove</button>
+                </div>
+              </tr>
+            ))}
           </tbody>
         </table>
+        <div className="remove-button">
+          <button onClick={() => cancelHandler()}>Cancel</button>
+          {/* </div>
+        <div className="remove-button"> */}
+          <button onClick={() => detailsHandler()}>Add More</button>
+        </div>
       </div>
     </div>
   );

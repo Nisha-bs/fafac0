@@ -336,7 +336,7 @@ const ViewFarmer = () => {
   //     }
   // ]
 
-  const api = "https://0912-122-164-81-58.in.ngrok.io";
+  const api = "https://a77b-49-204-112-10.in.ngrok.io";
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [farmer, setFarmer] = useState([]);

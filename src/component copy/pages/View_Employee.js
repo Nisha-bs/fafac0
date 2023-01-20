@@ -19,7 +19,7 @@ const View = () => {
       },
     };
     axios
-      .get(`https://7bff-122-164-81-58.in.ngrok.io/employee/all`, formtoken)
+      .get(`https://a77b-49-204-112-10.in.ngrok.io/employee/all`, formtoken)
       .then((response) => {
         console.log(response.data);
         dispatch(authActions.employee(response.data));

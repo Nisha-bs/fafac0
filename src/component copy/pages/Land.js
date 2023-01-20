@@ -9,6 +9,8 @@ import { landActions } from "../../store/landStore";
 import { useSelector } from "react-redux";
 import { Action } from "@remix-run/router";
 import Layout from "../Layout/Layout";
+import { GiDivingDagger } from "react-icons/gi";
+// import AvailableLeaseTable from "./AvailableLeaseTable";
 
 const Land = () => {
   const navigate = useNavigate();
@@ -621,31 +623,41 @@ const Land = () => {
 
   const dispatch = useDispatch();
   const { landData } = useSelector((state) => state.land);
-  console.log(landData, "landdetails");
+  const selected = useSelector((state) => state.land.selectedLand);
+  // console.log(landData, "landdetails", selected[0].farmerid);
   const availabelLeaseOwnerIdList = [];
   const availableLeaseLandIdList = [];
-  const availabelLeaseList = {};
+  const availableLeaseFarmers = [];
+  const availableLeaseList = [];
 
   const [area, setArea] = useState("");
   const [interestedFor, setInterestedFor] = useState("");
-  const [table, setTable] = useState(false);
-  // const [selectedFarming, setSelectedFarming] = useState("");
-  const [update, setUpdate] = useState([]);
   const [addOns, setAddOns] = useState("None");
   const [supervisorID, setSupervisorID] = useState("");
-  // const [wasteland, setWasteLand] = useState("");
   const [landId, setLandId] = useState("");
   const [list, setList] = useState([]);
   const [landid, setLandid] = useState();
   const leasedIdList = [];
-  console.log(landId, landid);
-
+  // console.log(landId, landid);
+  //check
   const [ownFarmingCheck, setOwnFarmingCheck] = useState(false);
-  const [leasedLandCheck, setLeaseLandCheck] = useState(false);
   const [takenLeaseCheck, setTakenLeaseCheck] = useState(false);
-  const [wasteLandCheck, setWasteLandCheck] = useState(false);
-  const [availableForLeaseCheck, setAvailableForLeaseCheck] = useState(false);
   const [initial, setInitial] = useState(false);
+
+  // useEffect(() => {
+  //   console.log("selected", selected);
+  //   if (takenLeaseCheck) {
+  //     setSupervisorID(selected[0].farmerid);
+  //     setLandId(selected[0].landid);
+  //     setInterestedFor(selected[0].category);
+  //     setArea(selected[0].area);
+  //   } else {
+  //     setSupervisorID("");
+  //     setLandId("");
+  //     setInterestedFor("");
+  //     setArea("");
+  //   }
+  // }, [takenLeaseCheck]);
 
   const farmingList = ["interestedToClean", "cleanupTOFarm", "None"];
 
@@ -653,273 +665,135 @@ const Land = () => {
     if (interestedFor == "") {
       setInitial(true);
       setOwnFarmingCheck(false);
-      setWasteLandCheck(false);
-      setLeaseLandCheck(false);
       setTakenLeaseCheck(false);
-      setAvailableForLeaseCheck(false);
-    } else if (interestedFor == "ownFarming") {
+    } else if (
+      interestedFor === "ownFarming" ||
+      interestedFor === "availableForLease" ||
+      interestedFor === "wasteLand"
+    ) {
       setInitial(false);
       setOwnFarmingCheck(true);
-      setWasteLandCheck(false);
-      setLeaseLandCheck(false);
       setTakenLeaseCheck(false);
-      setAvailableForLeaseCheck(false);
-    } else if (interestedFor == "wasteLand") {
+    } else if (interestedFor === "takenLease") {
       setInitial(false);
       setOwnFarmingCheck(false);
-      setWasteLandCheck(true);
-      setLeaseLandCheck(false);
-      setTakenLeaseCheck(false);
-      setAvailableForLeaseCheck(false);
-    } else if (interestedFor == "leasedLand") {
-      setInitial(false);
-      setOwnFarmingCheck(false);
-      setWasteLandCheck(false);
-      setTakenLeaseCheck(false);
-      setAvailableForLeaseCheck(false);
-      setLeaseLandCheck(true);
-    } else if (interestedFor == "takenLease") {
-      setInitial(false);
-      setOwnFarmingCheck(false);
-      setWasteLandCheck(false);
-      setLeaseLandCheck(false);
-      setAvailableForLeaseCheck(false);
       setTakenLeaseCheck(true);
-    } else if (interestedFor == "availableForLease") {
-      setInitial(false);
-      setOwnFarmingCheck(false);
-      setWasteLandCheck(false);
-      setLeaseLandCheck(false);
-      setTakenLeaseCheck(false);
-      setAvailableForLeaseCheck(true);
     }
   }, [interestedFor]);
+
+  const { farmer_id } = useSelector((state) => state.farmer);
+  console.log("farmerid", farmer_id);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     console.log(area, interestedFor, addOns, supervisorID);
 
-    const userData = {
-      farmerId: "JEY0002",
-      area: 102,
-      category: "availableForLease",
-      addons: "None",
-      supervisorId: "",
-    };
+    await axios({
+      url: "https://66d4-49-204-138-29.in.ngrok.io/land/create",
+      method: "post",
+      data: {
+        landDetails: [
+          {
+            // farmerId: farmer_id[0],
+            farmerId: "SWE0004",
+            area: area,
+            category: interestedFor,
+            addons: addOns,
+            supervisorId: supervisorID,
+          },
+        ],
+      },
+    })
+      .then((response) => {
+        console.log("res", response.data);
 
-    // await axios({
-    //   url: "http://90b9-49-204-114-12.in.ngrok.io/land/create",
+        //DISPATCH TO LANDdATA
+        const userData = {
+          farmerId: farmer_id[0],
+          landId: response.data.landId,
+          area: area,
+          category: interestedFor,
+          addons: addOns,
+          supervisorId: supervisorID,
+        };
 
-    //   method: "post",
-    //   data: {
-    //     landDetails: [
-    //       {
-    //         farmerId: "SWE0007",
-    //         area: area,
-    //         category: interestedFor,
-    //         wasteland: wasteland,
-    //         addons: addOns,
-    //         supervisorId: supervisorID,
-    //       },
-    //     ],
-    //   },
-    //   // body: JSON.stringify(userData),
-    //   // headers: {
-    //   //   "content-type": "application/json",
-    //   // },
-    // })
-    //   .then((response) => {
-    //     console.log("res", response);
-
-    // const data = [];
-    // data.push(farmerLandDetails, userData);
-
-    dispatch(landActions.createLand([...landData, userData]));
-    setTable(true);
-
-    // landDetails: [
-    //       {
-    //         farmerId: "SWE0007",
-    //         area: area,
-    //         category: interestedFor,
-    //         wasteland: wasteland,
-    //         addons: addOns,
-    //         supervisorId: supervisorID,
-    //       },
-    //     ],
-
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-
-    // if (interestedFor == "takenLease") {
-    //   await axios({
-    //     url: "http://90b9-49-204-114-12.in.ngrok.io/land/rent",
-    //     method: "post",
-    //     data: {
-    //       rentLandDetails: [
-    //         {
-    //           farmerId: "MAH0006",
-    //           landId: landid,
-    //           ownerId: supervisorID,
-    //         },
-    //       ],
-    //     },
-    //   })
-    //     .then((response) => {
-    //       console.log("rentresponse", response);
-    //     })
-    //     .catch((error) => {
-    //       console.log("rent error", error);
-    //     });
-    // }
-
-    navigate("/cropform");
-  };
-
-  if (interestedFor == "takenLease") {
-    // await axios({
-    //   url: "http://90b9-49-204-114-12.in.ngrok.io/land/rent",
-    //   method: "post",
-    //   data: {
-    //     rentLandDetails: [
-    //       {
-    //         farmerId: "MAH0006",
-    //         landId: landid,
-    //         ownerId: supervisorID,
-    //       },
-    //     ],
-    //   },
-    // })
-    //   .then((response) => {
-    //     console.log("rentresponse", response);
-    //   })
-    //   .catch((error) => {
-    //     console.log("rent error", error);
-    //   });
-  } else if (interestedFor == "") {
-    farmerDetails.map((farmer) => {
-      // console.log("landdetails", farmer.landDetails);
-      if (farmer.landDetails == []) {
-        console.log("no land details area available");
-      } else {
-        farmerDetails.map((land) => {
-          // console.log(
-          // "land",
-          land.landDetails.map((cat) => {
-            // console.log("cat", cat.category);
-            if (cat.category == "availableForLease") {
-              // if (!availabelLeaseOwnerIdList.includes(cat.ownerId)) {
-              // console.log("lis");
-              // availabelLeaseOwnerIdList.push(cat.ownerId);
-
-              if (!availableLeaseLandIdList.includes(cat.landId)) {
-                availabelLeaseOwnerIdList.push(cat.ownerId);
-                availableLeaseLandIdList.push(cat.landId);
-                const arr = availableLeaseLandIdList.filter(
-                  (ids) => ids.slice(0, 3) == cat.landId.slice(0, 3)
-                );
-                // console.log("arr", arr);
-                availabelLeaseList[cat.ownerId] = arr;
-              }
-              // console.log(
-              //   "avail",
-              //   availabelLeaseOwnerIdList,
-              //   availableLeaseLandIdList,
-              //   availabelLeaseList
-              // );
-              // }
-            }
-            // console.log(
-            //   "availabelLeaseList",
-            //   availabelLeaseOwnerIdList,
-            //   availableLeaseLandIdList
-            // );
-          });
-          // );
-        });
-      }
-    });
-  } else if (interestedFor == "takenLease") {
-    console.log("yes");
-
-    farmerDetails.map((farmer) => {
-      // console.log("landdetails", farmer.landDetails);
-      if (farmer.landDetails == []) {
-        console.log("no land details area available");
-      } else {
-        farmerDetails.map((land) => {
-          // console.log(
-          // "land",
-          land.landDetails.map((cat) => {
-            // console.log("cat", cat.category);
-            if (cat.category == "availableForLease") {
-              // if (!availabelLeaseOwnerIdList.includes(cat.ownerId)) {
-              // console.log("lis");
-              // availabelLeaseOwnerIdList.push(cat.ownerId);
-
-              if (!availableLeaseLandIdList.includes(cat.landId)) {
-                availabelLeaseOwnerIdList.push(cat.ownerId);
-                availableLeaseLandIdList.push(cat.landId);
-                const arr = availableLeaseLandIdList.filter(
-                  (ids) => ids.slice(0, 3) == cat.landId.slice(0, 3)
-                );
-                console.log("arr", arr);
-                availabelLeaseList[cat.ownerId] = arr;
-              }
-              // console.log(
-              //   "avail",
-              //   availabelLeaseOwnerIdList,
-              //   availableLeaseLandIdList,
-              //   availabelLeaseList
-              // );
-              // }
-            }
-            // console.log(
-            //   "availabelLeaseList",
-            //   availabelLeaseOwnerIdList,
-            //   availableLeaseLandIdList
-            // );
-          });
-          // );
-        });
-      }
-    });
-  } else if (interestedFor == "leasedLand") {
-    farmerDetails.map((farmer) => {
-      console.log("leasedland", farmer.landDetails);
-      farmer.landDetails.map((ids) => {
-        console.log("id", ids.ownerId);
-        if (ids.ownerId != "") {
-          if (!leasedIdList.includes(ids.ownerId)) {
-            leasedIdList.push(ids.ownerId);
-          }
-        }
-        console.log("lease", leasedIdList);
+        dispatch(landActions.createLand(userData));
+        navigate("/landtable");
+      })
+      .catch((error) => {
+        console.log("err", error);
       });
-    });
-  } else {
-    console.log("no");
-  }
-
-  const submitNextHandler = () => {
-    setTable(false);
-    navigate("/cropform");
+    //without using api
   };
-  const selectedId = Object.entries(availabelLeaseList);
 
   useEffect(() => {
-    if (!supervisorID == "") {
-      selectedId.map((val) => {
-        if (val[0] == supervisorID) {
-          setList(val[1]);
-        }
-        // console.log("1234567890", val[0], val[1], list);
-      });
+    console.log("innnnnnnnnnnn");
+    const availableLeaseListTable = [];
+    if (interestedFor === "takenLease") {
+      console.log("interestedFor", interestedFor);
+      //farmerDetails means full farmer details using api
+
+      // axios({
+      //   url: "https://bbeb-122-164-86-57.in.ngrok.io/farmer/all",
+      //   method: "get",
+      // })
+      //   .then((response) => {
+      //     console.log("response", response);
+      //   })
+      //   .catch((error) => {
+      //     console.log("error", error);
+      //   });
+
+      farmerDetails.map((farmer) =>
+        farmer.landDetails.map((land) => {
+          if (land.category === "availableForLease") {
+            availableLeaseListTable.push({
+              name: farmer.farmerDetails.farmerName,
+              fathername: farmer.farmerDetails.fatherName,
+              area: land.area,
+              farmerid: land.ownerId,
+              landid: land.landId,
+              category: interestedFor,
+            });
+            // dispatch(
+            //   landActions.rentalUpdate({
+            //     farmerId: farmer.farmerDetails.farmerId,
+            //     landId: land.landId,
+            //     ownerId: land.ownerId,
+            //   })
+            // );
+          }
+        })
+      );
+    } else if (
+      interestedFor === "ownFarming" ||
+      interestedFor === "wasteLand" ||
+      interestedFor === "availableForLease"
+    ) {
+      //for other api
+      // dispatch(
+      //   landActions.createLand({
+      //     farmerId: "JEY0001",
+      //     area: area,
+      //     category: interestedFor,
+      //     addons: addOns,
+      //     supervisorId: supervisorID,
+      //   })
+      // );
     }
-  }, [supervisorID]);
-  console.log(list);
+
+    // console.log(availableLeaseListTable);
+
+    // dispatch(landActions.updateLeaseLands(availableLeaseListTable));
+  }, [interestedFor]);
+
+  const landHandler = () => {
+    setInterestedFor("takenLease");
+    navigate("/selectlandtable");
+  };
+
+  const { selectedLand } = useSelector((state) => state.land);
+  console.log(("selectedland", selectedLand));
 
   return (
     <Layout>
@@ -935,82 +809,6 @@ const Land = () => {
               >
                 <option value="choose"> category </option>
                 <option value="ownFarming"> ownFarming </option>
-                <option value="leasedLand"> leasedLand </option>
-                <option value="wasteLand"> wasteLand </option>
-                <option value="takenLease"> takenLease </option>
-                <option value="availableForLease"> availableForLease </option>
-              </select>
-            </div>
-            <div>
-              <input
-                placeholder="Area"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                type="number"
-              />
-            </div>
-
-            <div>
-              <select
-                name="states"
-                id="states"
-                onChange={(e) => setAddOns(e.target.value)}
-              >
-                <option value="">addOn </option>
-                {farmingList.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={classes.submit}>
-              <select
-                disabled
-                name="states"
-                id="states"
-                onChange={(e) => setSupervisorID(e.target.value)}
-              >
-                <option value="">supervisorId </option>
-                {Object.keys(availabelLeaseList).map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className={classes.next}>
-              <select
-                disabled
-                name="states"
-                id="states"
-                onChange={(e) => setLandid(e.target.value)}
-              >
-                <option value="">land Id </option>
-                {list.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <button onClick={submitHandler}>submit</button>
-            </div>
-          </form>
-        )}
-        {leasedLandCheck && (
-          <form>
-            <div>
-              <select
-                placeholder="category"
-                value={interestedFor}
-                onChange={(e) => setInterestedFor(e.target.value)}
-              >
-                <option value="choose"> category </option>
-                <option value="ownFarming"> ownFarming </option>
-                <option value="leasedLand"> leasedLand </option>
                 <option value="wasteLand"> wasteLand </option>
                 <option value="takenLease"> takenLease </option>
                 <option value="availableForLease"> availableForLease </option>
@@ -1041,114 +839,25 @@ const Land = () => {
             </div>
 
             <div>
-              <select
-                name="states"
-                id="states"
+              <input
+                placeholder="supervisorID"
+                value={supervisorID}
                 onChange={(e) => setSupervisorID(e.target.value)}
-              >
-                <option value="">supervisorId </option>
-                {availabelLeaseOwnerIdList.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <select
-                disabled
-                name="states"
-                id="states"
-                onChange={(e) => setLandid(e.target.value)}
-              >
-                <option value="">land Id </option>
-                {list.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <button onClick={submitHandler}>submit</button>
-            </div>
-          </form>
-        )}
-        {wasteLandCheck && (
-          <form>
-            <div>
-              <select
-                placeholder="category"
-                value={interestedFor}
-                onChange={(e) => setInterestedFor(e.target.value)}
-              >
-                <option value="choose"> category </option>
-                <option value="ownFarming"> ownFarming </option>
-                <option value="leasedLand"> leasedLand </option>
-                <option value="wasteLand"> wasteLand </option>
-                <option value="takenLease"> takenLease </option>
-                <option value="availableForLease"> availableForLease </option>
-              </select>
+              />
             </div>
             <div>
               <input
-                placeholder="Area"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                type="number"
-              />
-            </div>
-
-            <div>
-              <select
-                name="states"
-                id="states"
-                onChange={(e) => setAddOns(e.target.value)}
-              >
-                <option value="">addOn </option>
-                {farmingList.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <select
-                disabled
-                name="states"
-                id="states"
-                onChange={(e) => setSupervisorID(e.target.value)}
-              >
-                <option value="">supervisorId </option>
-                {Object.keys(availabelLeaseList).map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <select
-                disabled
-                name="states"
-                id="states"
+                placeholder="landID"
+                value={landId}
                 onChange={(e) => setLandId(e.target.value)}
-              >
-                <option value="">land Id </option>
-                {list.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div>
               <button onClick={submitHandler}>submit</button>
             </div>
           </form>
         )}
+
         {takenLeaseCheck && (
           <form>
             <div>
@@ -1166,135 +875,84 @@ const Land = () => {
                   <option value="availableForLease"> availableForLease </option>
                 </select>
               </div>
-              <input
-                placeholder="Area"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                type="number"
-              />
-            </div>
 
-            <div>
-              <select
-                disabled
-                name="states"
-                id="states"
-                onChange={(e) => setAddOns(e.target.value)}
-              >
-                <option value="">addOn </option>
-                {farmingList.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
+              <div>
+                <button type="button" onClick={landHandler}>
+                  select land
+                </button>
+              </div>
 
-            <div>
-              <select
-                name="states"
-                id="states"
-                onChange={(e) => setSupervisorID(e.target.value)}
-              >
-                <option value="">supervisorId </option>
-                {Object.keys(availabelLeaseList).map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <select
-                name="states"
-                id="states"
-                onChange={(e) => setLandid(e.target.value)}
-              >
-                <option value="">land Id </option>
-                {list.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <button onClick={submitHandler}>submit</button>
-            </div>
-          </form>
-        )}
-        {availableForLeaseCheck && (
-          <form>
-            <div>
-              <select
-                placeholder="category"
-                value={interestedFor}
-                onChange={(e) => setInterestedFor(e.target.value)}
-              >
-                <option value="choose"> category </option>
-                <option value="ownFarming"> ownFarming </option>
-                {/* <option value="leasedLand"> leasedLand </option> */}
-                <option value="wasteLand"> wasteLand </option>
-                <option value="takenLease"> takenLease </option>
-                <option value="availableForLease"> availableForLease </option>
-              </select>
-            </div>
-            <div>
-              <input
-                placeholder="Area"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                type="number"
-              />
-            </div>
+              <div>
+                <input
+                  placeholder="Area"
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  type="number"
+                />
+              </div>
 
-            <div>
-              <select
-                name="states"
-                id="states"
-                onChange={(e) => setAddOns(e.target.value)}
-              >
-                <option value="">addOn </option>
-                {farmingList.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
+              <div>
+                <input
+                  placeholder="supervisorID"
+                  value={supervisorID}
+                  onChange={(e) => setSupervisorID(e.target.value)}
+                />
+                {/* <select
+                  disabled
+                  name="states"
+                  id="states"
+                  onChange={(e) => setAddOns(e.target.value)}
+                >
+                  <option value="">addOn </option>
+                  {/* {farmingList.map((state) => ( */}
+                {/* <option
+                    key={selectedLand.landid}
+                    value={selectedLand.farmerid}
+                  >
+                    {selectedLand.farmerid}
                   </option>
-                ))}
-              </select>
-            </div>
+                  ))}
+                </select> */}
+              </div>
 
-            <div>
-              <select
-                disabled
-                name="states"
-                id="states"
-                onChange={(e) => setSupervisorID(e.target.value)}
-              >
-                <option value="">supervisorId </option>
-                {Object.keys(availabelLeaseList).map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <select
-                disabled
-                name="states"
-                id="states"
-                onChange={(e) => setLandid(e.target.value)}
-              >
-                <option value="">land Id </option>
-                {list.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <button onClick={submitHandler}>submit</button>
+              <div>
+                {/* <select
+                  name="states"
+                  id="states"
+                  onChange={(e) => setSupervisorID(e.target.value)}
+                >
+                  <option value="">supervisorId </option>
+                  {supervisor}
+                  {/* {selected.map((state) => (
+                    <option key={state.landid} value={state.landid}>
+                      {state.farmerid}
+                    </option>
+                  ))} */}
+                {/* </select> */}
+              </div>
+
+              <div>
+                <input
+                  placeholder="landID"
+                  value={landId}
+                  onChange={(e) => setLandId(e.target.value)}
+                />
+                {/* <select
+                  name="states"
+                  id="states"
+                  onChange={(e) => setLandid(e.target.value)}
+                >
+                  <option value="">land Id </option>
+                  {list.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select> */}
+              </div>
+              <div>
+                <button onClick={() => submitHandler()}>submit</button>
+              </div>
             </div>
           </form>
         )}
@@ -1308,7 +966,6 @@ const Land = () => {
               >
                 <option value="choose"> category </option>
                 <option value="ownFarming"> ownFarming </option>
-                {/* <option value="leasedLand"> leasedLand </option> */}
                 <option value="wasteLand"> wasteLand </option>
                 <option value="takenLease"> takenLease </option>
                 <option value="availableForLease"> availableForLease </option>
@@ -1339,39 +996,26 @@ const Land = () => {
             </div>
 
             <div>
-              <select
-                name="states"
-                id="states"
+              <input
+                placeholder="supervisorID"
+                value={supervisorID}
                 onChange={(e) => setSupervisorID(e.target.value)}
-              >
-                <option value="">supervisorId </option>
-                {Object.keys(availabelLeaseList).map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div>
-              <select
-                name="states"
-                id="states"
-                onChange={(e) => setLandid(e.target.value)}
-              >
-                <option value="">land Id </option>
-                {list.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
+              <input
+                placeholder="landID"
+                value={landId}
+                onChange={(e) => setLandId(e.target.value)}
+              />
             </div>
             <div>
-              <button onClick={submitHandler}>submit</button>
+              <button style={{ float: "left" }} onClick={submitHandler}>
+                submit
+              </button>
             </div>
           </form>
         )}
-        {/* {table && <LandTable />} */}
       </div>
     </Layout>
   );
